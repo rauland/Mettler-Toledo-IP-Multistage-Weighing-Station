@@ -6,8 +6,6 @@ ws = {}
 async def connection(host, port, con_num):
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
         s.connect((host, port))
-        # s.sendall(b"Hello, world")
-        
         while True:
             data = s.recv(8096)
             print(f"{con_num} {data!r}")
@@ -51,13 +49,10 @@ Draw()
 
 async def main():
     await asyncio.gather(
+        Refresher(),
         connection('192.168.10.200', 1749,1),
         connection('192.168.10.201', 1749,2),
         connection('192.168.10.202', 1749,3),
-        Refresher()
         )
-    # loop.run_until_complete(Refresher())
 asyncio.run(main())
 root.mainloop()
-
-# loop.run_until_complete(writer.protocol.waiter_closed)
