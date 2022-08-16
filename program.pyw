@@ -44,7 +44,6 @@ s3 = telnetlib3.open_connection('192.168.10.202', 1749, shell=shell3)
 reader, writer = loop.run_until_complete(s1)
 reader, writer = loop.run_until_complete(s2)
 reader, writer = loop.run_until_complete(s3)
-# loop.run_until_complete(shell_output())
     
 def Draw():
     global text
@@ -52,7 +51,7 @@ def Draw():
     # root.overrideredirect(1)
     root.attributes('-topmost', True)
     root.title("Weighbridge Scale")
-    root.geometry("200x100")
+    root.geometry("200x60")
     frame=tk.Frame(root,width=200,height=100,relief='solid')
     frame.place(x=10,y=10)
     text=tk.Label(
