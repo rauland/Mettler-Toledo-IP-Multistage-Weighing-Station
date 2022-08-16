@@ -20,7 +20,7 @@ def Draw():
     # root.overrideredirect(1)
     root.attributes('-topmost', True)
     root.title("Weighbridge Scale")
-    root.geometry("200x100")
+    root.geometry("200x60")
     frame=tk.Frame(root,width=200,height=100,relief='solid')
     frame.place(x=10,y=10)
     text=tk.Label(
@@ -38,7 +38,7 @@ async def Refresher():
             total = float(w1.split()[0]) + float(w2.split()[0]) + float(w3.split()[0])
             # total = 6000 + 4000 + 5000
             text.configure(text=total/1000)
-            print(int(w1.split()[1]) + int(w2.split()[1]) + int(w3.split()[1]))
+            print(int(w1.split()[0]) + int(w2.split()[0]) + int(w3.split()[0]))
         except NameError:
             print("loading")
         except KeyError:
