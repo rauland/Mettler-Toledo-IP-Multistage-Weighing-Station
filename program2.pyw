@@ -40,7 +40,7 @@ async def refresher():
             total = float(w1.split()[0]) + float(w2.split()[0]) + float(w3.split()[0])
             # total = 6000 + 4000 + 5000
             text.configure(text=total / 1000)
-            print(int(w1.split()[0]) + int(w2.split()[0]) + int(w3.split()[0]))
+            print(int(total))
         # except NameError:
             # print("loading")
         except KeyError:
