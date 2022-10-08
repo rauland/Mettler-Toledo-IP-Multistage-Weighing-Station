@@ -11,19 +11,16 @@ if not ini.is_file():
     with open('config.ini', 'w') as configfile:
         config.write(configfile)
 
-config = configparser.ConfigParser()
-config.sections()
+def get():
+    config = configparser.ConfigParser()
+    config.sections()
 
-config.read('config.ini')
+    config.read('config.ini')
 
-scale = config['scale']
-port = scale['port']
+    scale = config['scale']
+    port = scale['port']
 
-ips = []
-for ip in scale['ip'].split(','):
-    ips += [ip]
-pass
-
-for ip in ips:
-    print (ip)
-pass
+    ips = []
+    for ip in scale['ip'].split(','):
+        ips += [ip]
+    return ips, port

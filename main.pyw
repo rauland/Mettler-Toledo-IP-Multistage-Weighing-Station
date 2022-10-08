@@ -1,5 +1,5 @@
 import tkinter as tk
-import asyncio, socket
+import asyncio, socket, config
 
 global ws
 ws = {}
@@ -43,11 +43,15 @@ async def refresher():
         await asyncio.sleep(0.1)
 
 async def main():
+    ips, port = config.get()
+    connection_list =[]
+    for ip in ips:
+        connection_list += [
+            connection(ip,int(port)),
+        ]
     await asyncio.gather(
         refresher(),
-        connection("192.168.10.200", 1749),
-        connection("192.168.10.201", 1749),
-        connection("192.168.10.202", 1749),
+        *connection_list,
     )
 
 asyncio.run(main())
