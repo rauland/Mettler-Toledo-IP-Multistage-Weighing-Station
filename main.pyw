@@ -18,7 +18,7 @@ def draw(root):
     # root.overrideredirect(1)
     root.attributes("-topmost", True)
     root.title("Weighbridge Scale")
-    root.geometry("200x60")
+    root.geometry("200x60-0-50")
     frame = tk.Frame(root, width=200, height=100, relief="solid")
     frame.place(x=10, y=10)
     text = tk.Label(
