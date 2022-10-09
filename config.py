@@ -1,6 +1,5 @@
 import configparser
 from pathlib import Path
-from turtle import position
 
 ini = Path("config.ini")
 if not ini.is_file():
