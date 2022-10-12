@@ -1,3 +1,4 @@
-# Mettler-Toledo-IP-Multistage-Weighing-Station
+# Mettler Toledo Multistage IP Scale
 A simple multistage weighing station program for Metterler Toledo Scales. 
+
 Using Asyncio, TCP and Tkinter.
