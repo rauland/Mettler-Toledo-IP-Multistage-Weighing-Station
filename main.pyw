@@ -18,7 +18,7 @@ def draw(root):
     # root.overrideredirect(1)
     root.attributes("-topmost", True)
     root.title("Weighbridge Scale")
-    root.geometry("200x60-0-50")
+    root.geometry(config.windowsposition)
     frame = tk.Frame(root, width=200, height=100, relief="solid")
     frame.place(x=10, y=10)
     text = tk.Label(
@@ -43,11 +43,10 @@ async def refresher():
         await asyncio.sleep(0.1)
 
 async def main():
-    ips, port = config.get()
     connection_list =[]
-    for ip in ips:
+    for ip in config.ips:
         connection_list += [
-            connection(ip,int(port)),
+            connection(ip,config.port),
         ]
     await asyncio.gather(
         refresher(),

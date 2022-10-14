@@ -12,13 +12,8 @@ if not ini.is_file():
     with open('config.ini', 'w') as configfile:
         config.write(configfile)
 
-def get():
-    config = configparser.ConfigParser()
-    # config.sections()
-    config.read('config.ini')
-
-    scale = config['scale']
-    port = scale['port']
-    ips = list(scale['ip'].split(','))
-
-    return ips, port
+conf = configparser.ConfigParser()
+conf.read('config.ini')
+ips = list(conf['scale']['ip'].split(','))
+port =int(conf['scale']['port'])
+windowsposition = conf['DEFAULT']['windowsposition']
