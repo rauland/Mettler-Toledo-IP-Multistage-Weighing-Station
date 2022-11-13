@@ -1,3 +1,4 @@
+# Copy config.ini.sample to config.ini or run program once to generate new config.ini file.
 [DEFAULT]
 windowsposition = 200x60-0-50
 
