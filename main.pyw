@@ -21,8 +21,8 @@ async def connection(host, port):
 def draw(root):
     root.resizable(0, 0)
     # root.overrideredirect(1)
-    root.attributes("-topmost", True)
-    root.title("Weighbridge Scale")
+    root.attributes("-toolwindow", 1,"-topmost", 1)
+    root.title("🚛 Weighbridge Scale ⚖️")
     root.geometry(config.windowsposition)
     frame = tk.Frame(root, width=200, height=100, relief="solid")
     frame.place(x=10, y=10)
