@@ -5,13 +5,18 @@ global ws
 ws = {}
 
 async def connection(host, port):
-    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-        s.connect((host, port))
-        while True:
-            data = s.recv(8096)
-            print(f"{host} {data!r}")
-            await asyncio.sleep(0.2)
-            ws[host] = data.decode()
+    while True:
+        try:    
+            with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+                s.connect((host, port))
+                while True:
+                    data = s.recv(8096)
+                    print(f"{host} {data!r}")
+                    await asyncio.sleep(0.2)
+                    ws[host] = data.decode()
+        except (socket.timeout, ConnectionError):
+            print(f"Failed to connect to {host}:{port}. Retrying in 5 seconds.")
+            await asyncio.sleep(5)
 
 def draw(root):
     root.resizable(0, 0)
