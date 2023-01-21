@@ -1,5 +1,5 @@
 # Mettler Toledo Scale
-This program connects to a Mettler Toledo Scale and displays the weight in tons. If there is more than one scale configured it displays the total combined weight.
+This program connects to a Mettler Toledo Scale and displays the weight in tons. If there is more than one scale configured it displays the total combined weight. This type of scale is used on multi-stage weigh bridges.
 
 Run once to generate a config file. The IP field can support one or more scales, seperated by comma delimiter.
 
