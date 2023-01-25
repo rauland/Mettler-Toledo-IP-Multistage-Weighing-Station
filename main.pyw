@@ -7,13 +7,13 @@ ws = {}
 async def connection(host, port):
     while True:
         try:    
-            with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-                s.connect((host, port))
-                while True:
-                    data = s.recv(8096)
-                    print(f"{host} {data!r}")
-                    await asyncio.sleep(0.2)
-                    ws[host] = data.decode()
+            reader, writer = await asyncio.open_connection(host, port)
+            while True:
+                data = await reader.read(8096)
+                print(f"{host} {data!r}")
+                await asyncio.sleep(0.2)
+                ws[host] = data.decode()
+            writer.close()
         except (socket.timeout, ConnectionError):
             print(f"Failed to connect to {host}:{port}. Retrying in 5 seconds.")
             await asyncio.sleep(5)
