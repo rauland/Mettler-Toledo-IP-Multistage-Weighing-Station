@@ -1,16 +1,12 @@
-# Mettler Toledo Multistage IP Scale
-A simple multistage weighing station program for Metterler Toledo Scales. 
+# Mettler Toledo Scale
+This program connects to a Mettler Toledo Scale and displays the weight in tons. If there is more than one scale configured it displays the total combined weight. This type of scale is used on multi-stage weigh bridges.
 
-Using Asyncio, TCP and Tkinter.
+Run once to generate a config file. The IP field can support one or more scales, seperated by comma delimiter.
 
-Run once to generate config file. The IP field can support 1 and more scales.
+> ip = 192.168.1.100,192.168.1.101,192.168.1.102
 
-# How does it work?
+![image](https://user-images.githubusercontent.com/30706122/213860647-2cba4694-46a9-4a7d-b115-9fb74c396fcf.png)
 
-The program is intended to connect to a Mettler Toledo IP Scale, it receives data over the network, and then display that data in a graphical user interface (GUI) created with the tkinter library.
+Included in the repo is a PowerShell build script that generates a .exe and .msi
 
-The connection function creates a new socket connection to the specified host and port using the socket library. It then enters a loop where it waits for data to be received from the server, updates a global dictionary called ws with the received data, and then waits for a short amount of time before repeating the process.
 
-The draw function creates the GUI by creating a new window using tkinter and adding a Frame and a Label to the window. The refresher function updates the text in the Label with the average value of all the entries in the ws dictionary.
-
-The main function uses asyncio to run the refresher and connection functions concurrently. It creates a list of connection tasks, one for each IP address in the config.ips list, and then waits for all the tasks to complete using asyncio.gather.
