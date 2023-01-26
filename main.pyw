@@ -14,7 +14,8 @@ async def connection(host, port):
                 await asyncio.sleep(0.2)
                 ws[host] = data.decode()
             writer.close()
-        except (socket.timeout, ConnectionError):
+        except (socket.timeout, ConnectionError, OSError):
+            ws[host] = -1
             print(f"Failed to connect to {host}:{port}. Retrying in 5 seconds.")
             await asyncio.sleep(5)
 
@@ -22,7 +23,7 @@ def draw(root):
     root.resizable(0, 0)
     # root.overrideredirect(1)
     root.attributes("-toolwindow", 1,"-topmost", 1)
-    root.title("🚛 Weighbridge Scale")
+    root.title("🚛 Weigh bridge Scale")
     root.geometry(config.windowsposition)
     frame = tk.Frame(root, width=200, height=100, relief="solid")
     frame.place(x=10, y=10)
@@ -40,8 +41,14 @@ async def refresher():
     while True:
         total = float(0)
         for w in ws:
-            w = ws[w][4:16]
-            total += float(w.split()[0])
+            while ws[w] == -1:
+                text.configure(text="Network Error")
+                # print(w +" Re-establishing connection")
+                root.update()
+                await asyncio.sleep(0.1)
+            else:
+                w = ws[w][4:16]
+                total += float(w.split()[0])
         text.configure(text=total / 1000)
         print(int(total))
         root.update()
