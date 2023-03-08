@@ -1,8 +1,7 @@
 import tkinter as tk
-import asyncio, socket, config
-
-global ws
-ws = {}
+import asyncio
+import socket
+import config
 
 async def connection(host, port):
     while True:
@@ -23,7 +22,7 @@ def draw(root):
     root.resizable(0, 0)
     # root.overrideredirect(1)
     root.attributes("-toolwindow", 1,"-topmost", 1)
-    root.title("🚛 Weigh bridge Scale")
+    root.title("🚛 Weigh bridge scale")
     root.geometry(config.windowsposition)
     frame = tk.Frame(root, width=200, height=100, relief="solid")
     frame.place(x=10, y=10)
@@ -48,7 +47,12 @@ async def refresher():
                 await asyncio.sleep(0.1)
             else:
                 w = ws[w][4:16]
-                total += float(w.split()[0])
+                try:
+                    total += float(w.split()[0])
+                except IndexError:
+                    print("list index out of range")
+                    # text.configure(text="Network Error")
+                    # root.update()
         text.configure(text=total / 1000)
         print(int(total))
         root.update()
@@ -65,4 +69,6 @@ async def main():
         *connection_list,
     )
 
-asyncio.run(main())
+if __name__ == '__main__':
+    ws = {}
+    asyncio.run(main())

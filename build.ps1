@@ -10,4 +10,4 @@ New-Installer -ProductName "WeighBridgeScale" -UpgradeCode '1f72da53-3058-4b30-9
     New-InstallerDirectory -PredefinedDirectoryName DesktopFolder -Content {
         New-InstallerShortcut -Name 'Weigh Bridge Scale' -FileId 'main' -WorkingDirectoryId 'WeighBridgeScale'
     }
- } -OutputDirectory (Join-Path $PSScriptRoot "output") -RequiresElevation -Version 1.1
+ } -OutputDirectory (Join-Path $PSScriptRoot "output") -RequiresElevation -Version 1.2
