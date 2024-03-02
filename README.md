@@ -9,6 +9,6 @@ Run once to generate a config file. The IP field can support one or more scales,
 
 Included in the repo is a PowerShell build script that generates a .exe and .msi
 
-# Server
+## Server
 Approximate stand in for Scale Server ran locally. Set config ip to 127.0.0.1.
 Used for debugging.
