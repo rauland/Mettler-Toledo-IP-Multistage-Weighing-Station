@@ -5,14 +5,13 @@ import config
 
 async def connection(host, port):
     while True:
-        try:    
+        try:
             reader, writer = await asyncio.open_connection(host, port)
             while True:
                 data = await reader.read(8096)
                 print(f"{host} {data!r}")
                 await asyncio.sleep(0.2)
                 ws[host] = data.decode()
-            writer.close()
         except (socket.timeout, ConnectionError, OSError):
             ws[host] = -1
             print(f"Failed to connect to {host}:{port}. Retrying in 5 seconds.")

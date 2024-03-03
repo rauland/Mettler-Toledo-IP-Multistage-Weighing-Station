@@ -3,8 +3,9 @@ import time
 import random
 
 # Mimic Scale Data
-def scale(weight = 20, plus = 0):
-    number = weight + plus
+def scale(weight = 0, change = 0):
+    number = weight + change
+    number = 0 if number < 0 else number
     formatted_number = "{:04d}".format(number)
     return number, f"zero {formatted_number} one two three"
 
@@ -25,8 +26,11 @@ class TCPHandler(socketserver.BaseRequestHandler):
             time.sleep(0.01)
 
             # This will increase scale weight slowly
-            if random.randint(0,1000) > 750:
+            ran = random.randint(0, 1000)
+            if ran > 900:
                weight, text = scale(weight, 20)
+            if ran < 50:
+               weight, text = scale(weight, -20)
 
 if __name__ == "__main__":
     HOST, PORT = "localhost", 1749
