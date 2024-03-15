@@ -3,7 +3,6 @@ import asyncio
 import socket
 import config
 import threading
-import queue
 
 async def connection(host, port):
     while True:
@@ -19,43 +18,42 @@ async def connection(host, port):
             print(f"Failed to connect to {host}:{port}. Retrying in 5 seconds.")
             await asyncio.sleep(5)
 
-async def refresher():
-    while True:
-        total = float(0)
-        for w in ws:
-            while ws[w] == -1:
-                text.configure(text="Network Error")
-                # print(w +" Re-establishing connection")
-                root.update()
-                await asyncio.sleep(0.1)
-            else:
-                w = ws[w][4:16]
-                try:
-                    total += float(w.split()[0])
-                except IndexError:
-                    print("list index out of range")
-                    # text.configure(text="Network Error")
-                    # root.update()
-        text.configure(text=total / 1000)
-        print(int(total))
-        root.update()
-        await asyncio.sleep(0.1)
+def updater():
+    print("Start weight update")
+    total = float(0)
+    for w in ws:
+        if ws[w] == -1:
+            text.configure(text="Network Error")
+            # print(w +" Re-establishing connection")
+        else:
+            w = ws[w][4:16]
+            try:
+                total += float(w.split()[0])
+            except IndexError:
+                text.configure(text="Index Error")
+                print("list index out of range")
+    text.configure(text=total / 1000)
+    print(int(total))
+    root.after(100, updater)
+    print("End weight update")
 
-async def main():
+async def corountine():
     connection_list =[]
     for ip in config.ips:
         connection_list += [
             connection(ip,config.port),
         ]
     await asyncio.gather(
-        refresher(),
         *connection_list,
     )
 
+def main():
+    asyncio.run(corountine())
+
 if __name__ == '__main__':
-    queues = []
     ws = {}
-    
+
+    # Create Tkinter App
     root = tk.Tk()
     root.resizable(0, 0)
     # root.overrideredirect(1)
@@ -71,4 +69,9 @@ if __name__ == '__main__':
     )
     text.pack()
 
-    asyncio.run(main())
+    # Start Connection Thread
+    threading.Thread(target=main).start()
+
+    # Main loop for Tkinter App
+    root.after(100, updater)
+    root.mainloop()
