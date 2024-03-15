@@ -2,6 +2,8 @@ import tkinter as tk
 import asyncio
 import socket
 import config
+import threading
+import queue
 
 async def connection(host, port):
     while True:
@@ -17,25 +19,7 @@ async def connection(host, port):
             print(f"Failed to connect to {host}:{port}. Retrying in 5 seconds.")
             await asyncio.sleep(5)
 
-def draw(root):
-    root.resizable(0, 0)
-    # root.overrideredirect(1)
-    root.attributes("-toolwindow", 1,"-topmost", 1)
-    root.title("🚛 Weigh bridge scale")
-    root.geometry(config.windowsposition)
-    frame = tk.Frame(root, width=200, height=100, relief="solid")
-    frame.place(x=10, y=10)
-    text = tk.Label(
-        frame,
-        text="loading",
-        font=("Helvetica", 20),
-    )
-    text.pack()
-    return text
-
 async def refresher():
-    root = tk.Tk()
-    text = draw(root)
     while True:
         total = float(0)
         for w in ws:
@@ -69,5 +53,22 @@ async def main():
     )
 
 if __name__ == '__main__':
+    queues = []
     ws = {}
+    
+    root = tk.Tk()
+    root.resizable(0, 0)
+    # root.overrideredirect(1)
+    root.attributes("-toolwindow", 1,"-topmost", 1)
+    root.title("🚛 Weigh bridge scale")
+    root.geometry(config.windowsposition)
+    frame = tk.Frame(root, width=200, height=100, relief="solid")
+    frame.place(x=10, y=10)
+    text = tk.Label(
+        frame,
+        text="loading",
+        font=("Helvetica", 20),
+    )
+    text.pack()
+
     asyncio.run(main())
