@@ -10,44 +10,47 @@ async def connection(host, port):
         try:
             reader, writer = await asyncio.open_connection(host, port)
             while True:
-                if checkclose():
+                if close():
                     return
                 data = await reader.read(8096)
                 # print(f"{host} {data!r}")
                 await asyncio.sleep(0.2)
                 ws[host] = data.decode()
         except (socket.timeout, ConnectionError, OSError):
-            if checkclose():
+            if close():
                 return
             ws[host] = -1
             print(f"Failed to connect to {host}:{port}. Retrying in 5 seconds.")
             await asyncio.sleep(5)
 
-def checkclose():
+def close():
     try:
-        message = the_queue.get_nowait()
-        if message is None:
-            print("thread_target: got None, exiting...")
+        if the_queue.queue[0] is None:
+            print("connection thread: got None, exiting...")
             return True
     except:
         pass 
 
 def updater():
     # print("Start weight update")
+    neterror = False
     total = float(0)
     for w in ws:
         if ws[w] == -1:
-            text.configure(text="Network Error")
-            # print(w +" Re-establishing connection")
+            neterror = True
         else:
             w = ws[w][4:16]
             try:
                 total += float(w.split()[0])
             except IndexError:
-                text.configure(text="Index Error")
+                neterror = True
                 print("list index out of range")
-    text.configure(text=total / 1000)
-    print(int(total))
+    if neterror:
+        reading.configure(text="Network Error")      
+    else:
+        scales.configure(text=f"⚖️ {len(ws)}")
+        reading.configure(text=total / 1000)
+    print(f"t: {int(total) :<8} s: {len(ws) :>1}")
     root.after(100, updater)
     # print("End weight update")
 
@@ -61,10 +64,11 @@ async def corountine():
         *connection_list,
     )
 
-def main():
+def threadtarget():
     asyncio.run(corountine())
 
 if __name__ == '__main__':
+    # Intialise weight dict; Host, Value pair.
     ws = {}
     
     # Create Tkinter App
@@ -74,17 +78,18 @@ if __name__ == '__main__':
     root.attributes("-toolwindow", 1,"-topmost", 1)
     root.title("🚛 Weigh bridge scale")
     root.geometry(config.windowsposition)
-    frame = tk.Frame(root, width=200, height=100, relief="solid")
-    frame.place(x=10, y=10)
-    text = tk.Label(
-        frame,
-        text="loading",
-        font=("Helvetica", 20),
-    )
-    text.pack()
+    
+    frame = tk.Frame(root, width=500, height=100, relief="solid")
+    frame.pack(fill='both', expand=True)
+    
+    reading = tk.Label(frame, text="loading", font=("Helvetica", 20))
+    reading.pack(side="left", padx=10,pady=10)
+
+    scales = tk.Label(frame, text="⚖️ 0", font=("Helvetica", 15))
+    scales.pack(side="right", padx=10)
 
     # Start Connection Thread
-    threading.Thread(target=main).start()
+    threading.Thread(target=threadtarget).start()
 
     # Main loop for Tkinter App
     root.after(100, updater)
