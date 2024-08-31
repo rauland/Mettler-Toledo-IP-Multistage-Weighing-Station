@@ -28,9 +28,9 @@ class TCPHandler(socketserver.BaseRequestHandler):
             # This will increase scale weight slowly
             ran = random.randint(0, 1000)
             if ran > 900:
-               weight, text = scale(weight, 20)
+                weight, text = scale(weight, 20)
             if ran < 50:
-               weight, text = scale(weight, -20)
+                weight, text = scale(weight, -20)
 
 if __name__ == "__main__":
     HOST, PORT = "localhost", 1749
