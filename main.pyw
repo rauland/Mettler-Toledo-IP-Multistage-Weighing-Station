@@ -1,43 +1,38 @@
 """Weigh Bridge Module"""
 import tkinter as tk
-import asyncio
 import socket
 import threading
+import time
 import config
 
-async def connection(host, port):
-    while not STOP:
-        try:
-            reader, _ = await asyncio.open_connection(host, port)
-            while not STOP:
-                data = await reader.read(8096)
-                # print(f"{host} {data!r}")
-                await asyncio.sleep(0.2)
-                weights[host] = data.decode()
-        except (socket.timeout, ConnectionError, OSError):
-            weights[host] = -1
-            print(f"Failed to connect to {host}:{port}. Retrying in 5 seconds.")
-            await asyncio.sleep(5)
-    if STOP:
-        print("connection thread: got STOP, exiting...")
+class Connection:
+    def __init__(self, host, port) -> None:
+        self.host = host
+        self.port = port
+        self.weight = ""
+        self.stop = False
 
-async def corountine():
-    connection_list =[]
-    for ip in config.ips:
-        connection_list += [
-            connection(ip,config.port),
-        ]
-    await asyncio.gather(
-        *connection_list,
-    )
+    def connection(self):
+        while not self.stop:
+            try:
+                with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+                    s.connect((self.host, self.port))
+                    s.setsockopt(socket.SOL_SOCKET, socket.SO_KEEPALIVE, 1)
+                    while not self.stop:
+                        data = s.recv(8096)
+                        time.sleep(0.2)
+                        self.weight = data.decode()
+            except (socket.timeout, ConnectionError, OSError):
+                self.weight = -1
+                print(f"Failed to connect to {self.host}:{self.port}. Retrying in 5 seconds.")
+                time.sleep(5)
+        if self.stop:
+            print(f"connection {self.host}: got STOP, exiting...")
 
-def threadtarget():
-    """Starts new thread for asyncio"""
-    asyncio.run(corountine())
-
-class App():
+class App:
     """APP GUI Class"""
     def __init__(self) -> None:
+        self.weights = []
         self.root = tk.Tk()
         self.root.resizable(0, 0)
         # root.overrideredirect(1)
@@ -59,38 +54,41 @@ class App():
         # print("Start weight update")
         neterror = False
         total = float(0)
-        for host, weight in weights.items():
-            if weight == -1:
+        for scale in self.weights:
+            if scale.weight == -1:
                 neterror = True
             else:
-                w = weight[4:16]
+                weight = scale.weight[4:16]
                 try:
-                    total += float(w.split()[0])
+                    total += float(weight.split()[0])
                 except IndexError:
                     neterror = True
-                    print(f"{host}'s list index out of range")
+                    print(f"{scale.host}'s list index out of range")
         if neterror:
             self.reading.configure(text="Network Error")
         else:
-            self.scales.configure(text=f"⚖️ {len(weights)}")
+            self.scales.configure(text=f"⚖️ {len(self.weights)}")
             self.reading.configure(text=total / 1000)
-        print(f"t: {int(total) :<8} s: {len(weights) :>1}")
+        print(f"t: {int(total) :<8} s: {len(self.weights) :>1}")
         self.root.after(100, self.update)
         # print("End weight update")
 
+    def connections(self):
+        for ip in config.ips:
+            self.weights +=[
+                Connection(ip,config.port),
+            ]
+        for weight in self.weights:
+            threading.Thread(target=weight.connection).start()
+
 if __name__ == '__main__':
-    # Intialise weights dict; (Host: Value)
-    weights = {}
-    STOP = False
     # Create tinker app
     app = App()
-
-    # Start Connection Thread for asyncio functions
-    threading.Thread(target=threadtarget).start()
-
+    # Start Connection Threads
+    app.connections()
     # Main loop for Tkinter App
     app.root.after(100, app.update)
     app.root.mainloop()
-
-    # Stop queue
-    STOP = True
+    # Stop Connection threads
+    for connection in app.weights:
+        connection.stop = True

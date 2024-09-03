@@ -33,7 +33,7 @@ class TCPHandler(socketserver.BaseRequestHandler):
                 weight, text = scale(weight, -20)
 
 if __name__ == "__main__":
-    HOST, PORT = "localhost", 1749
+    HOST, PORT = "0.0.0.0", 1749
 
     # Create the server, binding to localhost on port 1749
     server = socketserver.TCPServer((HOST, PORT), TCPHandler)
