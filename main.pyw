@@ -9,21 +9,26 @@ class Connection:
     def __init__(self, host, port) -> None:
         self.host = host
         self.port = port
-        self.weight = ""
         self.stop = False
+        self.weight = 0
+        self.status = 0
 
     def connection(self):
         while not self.stop:
             try:
+                self.status = 0
                 with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
                     s.connect((self.host, self.port))
                     s.setsockopt(socket.SOL_SOCKET, socket.SO_KEEPALIVE, 1)
                     while not self.stop:
                         data = s.recv(8096)
                         time.sleep(0.2)
-                        self.weight = data.decode()
-            except (socket.timeout, ConnectionError, OSError):
-                self.weight = -1
+                        data = data.decode()
+                        data = data[4:16]
+                        self.weight = float(data.split()[0])
+            except (socket.timeout, ConnectionError, OSError, IndexError):
+                self.weight = 0
+                self.status = 1
                 print(f"Failed to connect to {self.host}:{self.port}. Retrying in 5 seconds.")
                 time.sleep(5)
         if self.stop:
@@ -51,27 +56,22 @@ class App:
 
     def update(self):
         """Updates values in GUI"""
-        # print("Start weight update")
         neterror = False
-        total = float(0)
+        total = 0
         for scale in self.weights:
-            if scale.weight == -1:
-                neterror = True
+            if not scale.status > 0:
+                total += scale.weight
             else:
-                weight = scale.weight[4:16]
-                try:
-                    total += float(weight.split()[0])
-                except IndexError:
-                    neterror = True
-                    print(f"{scale.host}'s list index out of range")
+                neterror = True
+                netmsg = f"{scale.host} lost"
+                break
         if neterror:
-            self.reading.configure(text="Network Error")
+            self.reading.configure(text=netmsg)
         else:
+            self.reading.configure(text=total/1000)
             self.scales.configure(text=f"⚖️ {len(self.weights)}")
-            self.reading.configure(text=total / 1000)
-        print(f"t: {int(total) :<8} s: {len(self.weights) :>1}")
+            print(f"t: {int(total) :<8} s: {len(self.weights) :>1}")
         self.root.after(100, self.update)
-        # print("End weight update")
 
     def connections(self):
         for ip in config.ips:
