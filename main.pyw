@@ -11,15 +11,15 @@ class Connection:
         self.port = port
         self.stop = False
         self.weight = 0
-        self.status = 0
+        self.status = 1
 
     def connection(self):
         while not self.stop:
             try:
-                self.status = 0
                 with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
                     s.connect((self.host, self.port))
                     s.setsockopt(socket.SOL_SOCKET, socket.SO_KEEPALIVE, 1)
+                    self.status = 0
                     while not self.stop:
                         data = s.recv(8096)
                         time.sleep(0.2)
@@ -29,8 +29,8 @@ class Connection:
             except (socket.timeout, ConnectionError, OSError, IndexError):
                 self.weight = 0
                 self.status = 1
-                print(f"Failed to connect to {self.host}:{self.port}. Retrying in 5 seconds.")
-                time.sleep(5)
+                print(f"Failed to connect to {self.host}:{self.port}. Retrying...")
+                # time.sleep(5)
         if self.stop:
             print(f"connection {self.host}: got STOP, exiting...")
 
